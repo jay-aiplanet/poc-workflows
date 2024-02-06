@@ -1,0 +1,21 @@
+name: Production Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    # Optional: Add a manual approval step if needed
+
+    # Add steps for deploying to the production environment
+    - name: Deploy to Production
+      run: |
+        echo "Deploying to Production Environment..."
+        # Your deployment script or commands go here
