@@ -1,0 +1,90 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: decipher-ml
+  labels:
+    app: decipher-ml
+    component: decipher-ai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: decipher-ml
+      component: decipher-ai
+  template:
+    metadata:
+      labels:
+        app: decipher-ml
+        component: decipher-ai
+    spec:
+      volumes:
+        - name: model-volume
+          emptyDir: {}
+      nodeSelector:
+        alpha.eksctl.io/nodegroup-name: mlops-mediumv2
+      initContainers:
+        - name: model-downloader
+          image: amazon/aws-cli
+          command:
+            [
+              "sh",
+              "-c",
+              "aws s3 cp --recursive ${model_s3_url} /app/temp_s3Models",
+            ]
+          volumeMounts:
+            - name: model-volume
+              mountPath: "/app/temp_s3Models"
+          envFrom:
+            - configMapRef:
+                name: decipher-ml-configs
+            - secretRef:
+                name: decipher-ml-secrets
+      containers:
+        - name: decipher-ml-container
+          image: decipher_ml_image
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              cpu: "1"
+              memory: "2.5Gi"
+            limits:
+              cpu: "3.5"
+              memory: "3Gi"
+          volumeMounts:
+            - name: model-volume
+              mountPath: "/app/temp_s3Models" # path where the model gets downloaded
+          env:
+            - name: model_version
+              value: "0.1"
+            - name: model_s3_url
+              value: "s3://data-science1/two-tower-architecture/models/"
+            - name: aws_access_key
+              valueFrom:
+                secretKeyRef:
+                  name: decipher-ml-secrets
+                  key: aws_access_key
+            - name: aws_secret_access_key
+              valueFrom:
+                secretKeyRef:
+                  name: decipher-ml-secrets
+                  key: aws_secret_access_key
+          envFrom:
+            - configMapRef:
+                name: decipher-ml-configs
+            - secretRef:
+                name: decipher-ml-secrets
+
+ strategy:
+   canary:
+     canaryService: decipher-ml-service  # required
+     stableService: decipher-ml-service-v2  # required
+     trafficRouting:
+       istio:
+         virtualService:
+           name: rollout-vsvc   # required
+           routes:
+           - primary            # optional if there is a single route in VirtualService, required otherwise
+     steps:
+     - setWeight: 10 # overrides the weight provided in virtualservice
+     - pause: {}
