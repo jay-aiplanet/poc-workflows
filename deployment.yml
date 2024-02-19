@@ -58,7 +58,7 @@ spec:
             - name: model_version
               value: "0.1"
             - name: model_s3_url
-              value: "s3://new-bucket/new-path/models/v1"
+              value: "s3://new-bucket/new-path/models/"
             - name: aws_access_key
               valueFrom:
                 secretKeyRef:
@@ -87,4 +87,4 @@ spec:
            - primary            # optional if there is a single route in VirtualService, required otherwise
      steps:
      - setWeight: 10 # overrides the weight provided in virtualservice
-     - pause: {}
+     - pause: {}
