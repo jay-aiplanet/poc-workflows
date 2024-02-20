@@ -1,21 +1,15 @@
-  name: Staging Deployment via Dispatch
+name: Staging Deployment via Dispatch
 
-  on:
-   repository_dispatch:
+on:
+  repository_dispatch:
     types: [deploy-staging]
-   #workflow_dispatch:
-    #  inputs:
-     #   model_s3_url:
-      #    description: 'Model S3 URL'
-       #   required: true
-  jobs:
-    deploy:
-      runs-on: ubuntu-latest
-      steps:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
       - name: Checkout Code
         uses: actions/checkout@v2
-
-
 
       - name: Deploy to Staging
         run: |
@@ -25,26 +19,9 @@
 
       - name: Set Model S3 URL
         run: |
-          #sed -i 's|value: "s3://new-bucket/new-path/models/v3"|value: "YOUR_NEW_S3_URL"|' path/to/your/rollout-manifest.yaml
-          #sed -i 's/value: s3:\/\/[^ ]*/value: ${{ github.event.client_payload.model_s3_url }}/g' argocd/argo-rollout.yml
           sed -i 's|value: "s3://[^"]*"|value: "${{ github.event.client_payload.model_s3_url }}"|' argocd/argo-rollout.yml
           cat argocd/argo-rollout.yml
 
-      # - name: Commit Changes
-      #   run: |
-      #     git config user.name "jay-aiplanet"
-      #     git config user.email "jay@aiplanet.com"
-      #     #git remote set-url origin "https://jay-aiplanet:${{ secrets.PAT }}@github.com/jay-aiplanet/poc-workflows.git"
-      #     git add argocd/argo-rollout.yml
-      #     git commit -m "Update model_s3_url in argo-rollout.yml"
-      #     git push
-
-
-      # - name: Debug Information
-      #   run: |
-      #     echo "GitHub Actor: ${{ github.actor }}"
-      #     echo "PAT: ${{ secrets.PAT }}"
-      #     git remote -v
       - name: Configure Git
         run: |
           git config --local user.email "actions@github.com"
@@ -55,13 +32,8 @@
           git add argocd/argo-rollout.yml
           git commit -m "Update model S3 URL in argocd/argo-rollout.yml"
 
-      # - name: Push changes
-      #   uses: ad-m/github-push-action@v0.7.0
-      #   with:
-      #     branch: ${{ github.ref }}
- 
       - name: Push changes
         run: |
           git push origin HEAD:${{ github.ref }}
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT }
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
