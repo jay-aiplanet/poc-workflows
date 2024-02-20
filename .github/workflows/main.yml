@@ -45,24 +45,20 @@
       #     echo "GitHub Actor: ${{ github.actor }}"
       #     echo "PAT: ${{ secrets.PAT }}"
       #     git remote -v
+      - name: Configure Git
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
 
-      - name: Commit and push changes
-        uses: actions/github-script@v5
+      - name: Commit changes
+        run: |
+          git add argocd/argo-rollout.yml
+          git commit -m "Update model S3 URL in argocd/argo-rollout.yml"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.7.0
         with:
-          script: |
-            const fs = require('fs');
-            const path = 'argocd/argo-rollout.yml';
-            const content = fs.readFileSync(path, 'utf8');
-            github.rest.repos.createOrUpdateFileContents({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              path: path,
-              message: 'Update argocd/argo-rollout.yml',
-              content: Buffer.from(content).toString('base64'),
-              branch: 'main',
-              committer: {
-                name: 'GitHub Actions',
-                email: 'actions@github.com'
+          branch: ${{ github.ref }}
               },
               author: {
                 name: 'GitHub Actions',
