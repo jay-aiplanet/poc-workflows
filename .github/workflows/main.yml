@@ -34,7 +34,7 @@
         run: |
           git config user.name "jay-aiplanet"
           git config user.email "jay@aiplanet.com"
-          git remote set-url origin "https://jay-aiplanet:${{ secrets.PAT }}@github.com/jay-aiplanet/poc-workflows.git"
+          #git remote set-url origin "https://jay-aiplanet:${{ secrets.PAT }}@github.com/jay-aiplanet/poc-workflows.git"
           git add argocd/argo-rollout.yml
           git commit -m "Update model_s3_url in argo-rollout.yml"
           git push
