@@ -38,3 +38,10 @@
           git add argocd/argo-rollout.yml
           git commit -m "Update model_s3_url in argo-rollout.yml"
           git push
+
+
+      - name: Debug Information
+        run: |
+          echo "GitHub Actor: ${{ github.actor }}"
+          echo "PAT: ${{ secrets.PAT }}"
+          git remote -v
