@@ -29,3 +29,11 @@
           #sed -i 's/value: s3:\/\/[^ ]*/value: ${{ github.event.client_payload.model_s3_url }}/g' argocd/argo-rollout.yml
           sed -i 's|value: "s3://[^"]*"|value: "${{ github.event.client_payload.model_s3_url }}"|' argocd/argo-rollout.yml
           cat argocd/argo-rollout.yml
+
+      - name: Commit Changes
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git add argo-rollout.yml
+          git commit -m "Update model_s3_url in argo-rollout.yml"
+          git push
