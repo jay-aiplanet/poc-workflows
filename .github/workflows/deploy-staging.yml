@@ -1,9 +1,12 @@
   name: Staging Deployment via Dispatch
 
+  # on:
+  #   repository_dispatch:
+  #     types: [deploy-staging]
   on:
-    repository_dispatch:
-      types: [deploy-staging]
-
+   push:
+     branches:
+       - main
   jobs:
     deploy:
       runs-on: ubuntu-latest
