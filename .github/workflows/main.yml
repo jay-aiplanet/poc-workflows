@@ -30,14 +30,14 @@
           sed -i 's|value: "s3://[^"]*"|value: "${{ github.event.client_payload.model_s3_url }}"|' argocd/argo-rollout.yml
           cat argocd/argo-rollout.yml
 
-      # - name: Commit Changes
-      #   run: |
-      #     git config user.name "jay-aiplanet"
-      #     git config user.email "jay@aiplanet.com"
-      #     git remote set-url origin "https://jay-aiplanet:${{ secrets.PAT }}@github.com/jay-aiplanet/poc-workflows.git"
-      #     git add argocd/argo-rollout.yml
-      #     git commit -m "Update model_s3_url in argo-rollout.yml"
-      #     git push
+      - name: Commit Changes
+        run: |
+          git config user.name "jay-aiplanet"
+          git config user.email "jay@aiplanet.com"
+          git remote set-url origin "https://jay-aiplanet:${{ secrets.PAT }}@github.com/jay-aiplanet/poc-workflows.git"
+          git add argocd/argo-rollout.yml
+          git commit -m "Update model_s3_url in argo-rollout.yml"
+          git push
 
 
       - name: Debug Information
@@ -46,10 +46,4 @@
           echo "PAT: ${{ secrets.PAT }}"
           git remote -v
 
-      - name: Commit Changes
-        run: |
-          git config user.name "${{ github.actor }}"
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
-          git add argocd/argo-rollout.yml
-          git commit -m "Update model_s3_url in argo-rollout.yml"
-          git push
+  
