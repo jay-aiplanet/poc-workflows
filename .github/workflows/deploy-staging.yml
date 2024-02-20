@@ -1,12 +1,11 @@
   name: Staging Deployment via Dispatch
 
-  # on:
-  #   repository_dispatch:
-  #     types: [deploy-staging]
   on:
-   push:
-     branches:
-       - main
+    workflow_dispatch:
+      inputs:
+        model_s3_url:
+          description: 'Model S3 URL'
+          required: true
   jobs:
     deploy:
       runs-on: ubuntu-latest
