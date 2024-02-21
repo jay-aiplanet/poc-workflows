@@ -22,26 +22,16 @@ jobs:
           sed -i 's|value: "s3://[^"]*"|value: "${{ github.event.client_payload.model_s3_url }}"|' argocd/argo-rollout.yml
           cat argocd/argo-rollout.yml
 
-      # - name: Configure Git
-      #   run: |
-      #     git config --local user.email "actions@github.com"
-      #     git config --local user.name "GitHub Actions"
-
-      - name: Commit changes
+      - name: Commit and Push Changes
         run: |
-          git add argocd/argo-rollout.yml
-          git commit -m "Update model S3 URL in argocd/argo-rollout.yml"
-
-      - name: Push changes
-        run: |
-          git config --global user.email "actions@github.com"
-          git config --global user.name "GitHub Actions"
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
           git add argocd/argo-rollout.yml
           git commit -m "Update model_s3_url in argo-rollout.yml"
-          git remote -v
-          git branch -a
-          git status
-          git log -n 3
-          git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git push
+
+      - name: Create Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: deployment-artifact
+          path: argocd/argo-rollout.yml  
