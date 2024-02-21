@@ -1,8 +1,10 @@
+
+
 name: Staging Deployment via Dispatch
 
 on:
   repository_dispatch:
-    types: [deploy-staging]
+    types: [stage]
 
 jobs:
   deploy:
@@ -10,28 +12,23 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
-
+  
       - name: Deploy to Staging
         run: |
           echo "Deploying to Staging Environment..."
           # Your deployment script or commands go here
           echo "model_s3_url: ${{ github.event.client_payload.model_s3_url }}"
-
+  
       - name: Set Model S3 URL
         run: |
           sed -i 's|value: "s3://[^"]*"|value: "${{ github.event.client_payload.model_s3_url }}"|' argocd/argo-rollout.yml
           cat argocd/argo-rollout.yml
-
       - name: Commit and Push Changes
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          
+          git config --global user.email "jay@aiplanet.com"
+          git config --global user.name "jay-aiplanet"
+          git checkout -b stage
           git add argocd/argo-rollout.yml
           git commit -m "Update model_s3_url in argo-rollout.yml"
-          git push
-
-      - name: Create Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: deployment-artifact
-          path: argocd/argo-rollout.yml  
+          git push origin stage --force
